@@ -1,1 +1,1 @@
-include ':app', ':gllib', ':medialib', ':common'
+include ':app', ':gllib', ':medialib', ':common', ':gldemo'

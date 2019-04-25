@@ -56,7 +56,7 @@ set CMD_LINE_ARGS=
 set _SKIP=2
 
 :win9xME_args_slurp
-if "x%~1" == "x" goto execute
+if "com.sykent.gl.x%~1" == "com.sykent.gl.x" goto execute
 
 set CMD_LINE_ARGS=%*
 
