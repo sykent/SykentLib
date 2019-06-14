@@ -1,11 +1,14 @@
 package com.sykent.gl.data;
 
 /**
+ * gl坐标系的变换
+ *
  * @author Sykent.Lao e-mail:sykent.lao@gmail.com blog:https://sykent.github.io/
  * @version 1.0
  * @since 2019/04/25
  */
 public class GLConversion {
+
     private float mTranslateX;
     private float mTranslateY;
     private float mTranslateZ;

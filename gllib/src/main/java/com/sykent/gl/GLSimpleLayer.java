@@ -16,9 +16,9 @@ public class GLSimpleLayer extends GLBaseLayer {
         this(context, false);
     }
 
-    public GLSimpleLayer(Context context, boolean isTopBottomReversal) {
+    public GLSimpleLayer(Context context, boolean flipY) {
         super(GLCoordBuffer.DEFAULT_VERTEX_COORDINATE,
-                isTopBottomReversal ? GLCoordBuffer.DEFAULT_TOP_AND_BOTTOM_REVERSAL_TEXTURE_COORDINATE
+                flipY ? GLCoordBuffer.DEFAULT_FLIP_Y_TEXTURE_COORDINATE
                         : GLCoordBuffer.DEFAULT_TEXTURE_COORDINATE,
                 VERTEX_SHADER, FRAGMENT_SHANDER);
     }

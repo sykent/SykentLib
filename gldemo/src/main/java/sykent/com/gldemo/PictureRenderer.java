@@ -14,8 +14,8 @@ import android.util.Log;
 import com.sykent.gl.GLSimpleLayer;
 import com.sykent.gl.core.GLOffscreenBuffer;
 import com.sykent.gl.core.MatrixState;
+import com.sykent.gl.utils.GLMatrixUtils;
 import com.sykent.gl.utils.GLUtilsEx;
-import com.sykent.gl.utils.MatrixUtils;
 import com.sykent.imagedecode.EBitmapFactory;
 import com.sykent.widget.GLTextureView;
 
@@ -75,8 +75,8 @@ public class PictureRenderer implements GLTextureView.Renderer {
         mWidth = width;
         mHeight = height;
         GLES20.glViewport(0, 0, width, height);
-        mPicLayer.setProjectOrtho(gl, width, height);
-        mMaskLayer.setProjectOrtho(gl, width, height);
+        mPicLayer.setProjectOrtho(width, height);
+        mMaskLayer.setProjectOrtho(width, height);
         if (mOffscreenBuffer != null) {
             mOffscreenBuffer.destroy();
         }
@@ -91,11 +91,11 @@ public class PictureRenderer implements GLTextureView.Renderer {
 
 //        mOffscreenBuffer.onBind();
 //        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
-//        mPicLayer.onDraw(mPicTextureId, mPicLayer.getMVPMatrix(), MatrixUtils.getIdentityMatrix());
+//        mPicLayer.onDraw(mPicTextureId, mPicLayer.getMVPMatrix(), GLMatrixUtils.getIdentityMatrix());
 //        GLES20.glEnable(GLES20.GL_BLEND);
 //        GLES20.glBlendFuncSeparate(GLES20.GL_ONE_MINUS_SRC_ALPHA, GLES20.GL_SRC_ALPHA, GLES20.GL_SRC_ALPHA, GLES20.GL_SRC_ALPHA);
 //        GLES20.glBlendEquation(GLES20.GL_FUNC_ADD);
-//        mMaskLayer.onDraw(mMaskTextureId, mMaskLayer.getMVPMatrix(), MatrixUtils.getIdentityMatrix());
+//        mMaskLayer.onDraw(mMaskTextureId, mMaskLayer.getMVPMatrix(), GLMatrixUtils.getIdentityMatrix());
 //        GLES20.glDisable(GLES20.GL_BLEND);
 //        mOffscreenBuffer.onUnBind();
 //
@@ -112,7 +112,7 @@ public class PictureRenderer implements GLTextureView.Renderer {
         MatrixState simpleLayerMatrixState = mPicLayer.getMatrixState();
 
 
-//        mPicLayer.onDraw(textureId, simpleLayerMatrixState.getMVPMatrix(), MatrixUtils.getIdentityMatrix());
+//        mPicLayer.onDraw(textureId, simpleLayerMatrixState.getMVPMatrix(), GLMatrixUtils.getIdentityMatrix());
 
 //        simpleLayerMatrixState.pushMatrix();
 //        simpleLayerMatrixState.translate(objectW - 1.0f, viewPortAspectRatio - objectH, 0.0f);
@@ -120,7 +120,7 @@ public class PictureRenderer implements GLTextureView.Renderer {
 //        GLES20.glEnable(GLES20.GL_BLEND);
 //        GLES20.glBlendFuncSeparate(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA, GLES20.GL_ONE, GLES20.GL_ONE);
 //        GLES20.glBlendEquation(GLES20.GL_FUNC_ADD);
-//        mPicLayer.onDraw(textureId, simpleLayerMatrixState.getMVPMatrix(), MatrixUtils.getIdentityMatrix());
+//        mPicLayer.onDraw(textureId, simpleLayerMatrixState.getMVPMatrix(), GLMatrixUtils.getIdentityMatrix());
 //        GLES20.glDisable(GLES20.GL_BLEND);
 //        simpleLayerMatrixState.popMatrix();
 
@@ -128,7 +128,7 @@ public class PictureRenderer implements GLTextureView.Renderer {
 //        simpleLayerMatrixState.translate(1.0f - objectW, viewPortAspectRatio - objectH, 0.0f);
 //        simpleLayerMatrixState.scale(scale, scale, 1.0f);
 //        simpleLayerMatrixState.rotate(180, 0, 0, 1);
-//        mPicLayer.onDraw(textureId, simpleLayerMatrixState.getMVPMatrix(), MatrixUtils.getIdentityMatrix());
+//        mPicLayer.onDraw(textureId, simpleLayerMatrixState.getMVPMatrix(), GLMatrixUtils.getIdentityMatrix());
 //        simpleLayerMatrixState.popMatrix();
         moveToViewport(textureId, simpleLayerMatrixState);
     }
@@ -174,11 +174,11 @@ public class PictureRenderer implements GLTextureView.Renderer {
         Log.d("ttttt", " tx: " + tx + "  ty: " + ty);
         GLES20.glViewport((int) androidShowRectF.left, (int) (mHeight - androidShowRectF.height() - androidShowRectF.top),
                 (int) androidShowRectF.width(), (int) androidShowRectF.height());
-        mPicLayer.setProjectOrtho(null, (int) androidShowRectF.width(), (int) androidShowRectF.height());
+        mPicLayer.setProjectOrtho((int) androidShowRectF.width(), (int) androidShowRectF.height());
         simpleLayerMatrixState.pushMatrix();
         simpleLayerMatrixState.translate(tx, ty, 0);
         simpleLayerMatrixState.scale(scale, scale, 0);
-        mPicLayer.onDraw(textureId, simpleLayerMatrixState.getMVPMatrix(), MatrixUtils.getIdentityMatrix());
+        mPicLayer.onDraw(textureId, simpleLayerMatrixState.getMVPMatrix(), GLMatrixUtils.getIdentityMatrix());
         simpleLayerMatrixState.popMatrix();
 
         GLES20.glViewport(0, 0, mWidth, mHeight);

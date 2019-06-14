@@ -4,15 +4,17 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.opengl.GLES20;
-import android.support.annotation.Nullable;
-import android.support.annotation.RawRes;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.RawRes;
 
 import com.sykent.utils.FileUtils;
 
 import java.nio.ByteBuffer;
 
 import sykent.com.gllib.BuildConfig;
+
 
 /**
  * @author Sykent.Lao e-mail:sykent.lao@gmail.com blog:https://sykent.github.io/
@@ -22,6 +24,7 @@ import sykent.com.gllib.BuildConfig;
 public class GLUtilsEx {
     private static final String TAG = GLUtilsEx.class.getSimpleName();
     public static final int NO_TEXTURE = -1;
+    public static final int INVALID_HANDLE = -1;
 
     public static int createProgram(Context context, String assetsVertexPath, String assetsFragmentPath) {
         String vertexSource = FileUtils.assets2String(context, assetsVertexPath);
@@ -205,9 +208,12 @@ public class GLUtilsEx {
     public static int createTexture(Bitmap bitmap, boolean flipX, boolean flipY) {
         Matrix matrix = new Matrix();
         matrix.postScale(flipX ? -1 : 1, flipY ? -1 : 1);
-        return createTexture(Bitmap.createBitmap(
-                bitmap, 0, 0, bitmap.getWidth(),
-                bitmap.getHeight(), matrix, true));
+        if (flipX || flipY) {
+            bitmap = Bitmap.createBitmap(
+                    bitmap, 0, 0, bitmap.getWidth(),
+                    bitmap.getHeight(), matrix, true);
+        }
+        return createTexture(bitmap);
     }
 
     public static int createTexture(Bitmap bitmap) {
@@ -235,6 +241,19 @@ public class GLUtilsEx {
         GLES20.glBindTexture(textureTarget, 0);
 
         return textureHandle[0];
+    }
+
+    public static int setBitmapOnTexture(int textureId, Bitmap bitmap,
+                                         boolean flipX, boolean flipY) {
+        Matrix matrix = new Matrix();
+        matrix.postScale(flipX ? -1 : 1, flipY ? -1 : 1);
+        if (flipX || flipY) {
+            bitmap = Bitmap.createBitmap(
+                    bitmap, 0, 0, bitmap.getWidth(),
+                    bitmap.getHeight(), matrix, true);
+        }
+
+        return setBitmapOnTexture(textureId, bitmap);
     }
 
     public static int setBitmapOnTexture(int textureId, Bitmap bitmap) {

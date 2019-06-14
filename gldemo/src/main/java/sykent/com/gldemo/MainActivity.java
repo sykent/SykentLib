@@ -1,11 +1,10 @@
 package sykent.com.gldemo;
 
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.LinearLayout;
-
-import com.sykent.widget.GLTextureView;
 
 import static com.sykent.widget.GLTextureView.RENDERMODE_CONTINUOUSLY;
 
@@ -14,8 +13,8 @@ public class MainActivity extends AppCompatActivity {
     private Button mButton;
     private LinearLayout mRoot;
 
-    private GLTextureView.Renderer mRenderer;
-    private GLTextureView mGLTextureView;
+    private GLSurfaceView.Renderer mRenderer;
+    private GLSurfaceView mGLTextureView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private void init() {
         mRenderer = new LayoutRenderer(this);
 
-        mGLTextureView = new GLTextureView(this);
+        mGLTextureView = new GLSurfaceView(this);
         mGLTextureView.setEGLContextClientVersion(2);
         mGLTextureView.setRenderer(mRenderer);
         mGLTextureView.setRenderMode(RENDERMODE_CONTINUOUSLY);

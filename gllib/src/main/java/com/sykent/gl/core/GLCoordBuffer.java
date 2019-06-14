@@ -95,7 +95,7 @@ public class GLCoordBuffer {
     };
 
     // 铺满视口默认上下翻转的纹理坐标
-    public static final float[] DEFAULT_TOP_AND_BOTTOM_REVERSAL_TEXTURE_COORDINATE = {
+    public static final float[] DEFAULT_FLIP_Y_TEXTURE_COORDINATE = {
             0.0f, 1.0f,            // 0 left top
             1.0f, 1.0f,            // 1 right top
             0.0f, 0.0f,            // 2 left bottom

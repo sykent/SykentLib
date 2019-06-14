@@ -5,9 +5,10 @@ import android.util.Log;
 
 import com.sykent.gl.utils.GLUtilsEx;
 
-import javax.microedition.khronos.opengles.GL10;
-
 import sykent.com.gllib.BuildConfig;
+
+import static com.sykent.gl.utils.GLUtilsEx.INVALID_HANDLE;
+
 
 /**
  * @author Sykent.Lao e-mail:sykent.lao@gmail.com blog:https://sykent.github.io/
@@ -17,18 +18,20 @@ import sykent.com.gllib.BuildConfig;
 public class GLBaseLayer implements GLLayer {
     private static final String TAG = GLBaseLayer.class.getSimpleName();
 
-    protected int mProgramHandle;
+    protected int mProgramHandle = INVALID_HANDLE;
 
-    protected int aPositionLoc;
-    protected int aTextureCoordLoc;
-    protected int uMVPMatrixLoc;
-    protected int uTexMatrixLoc;
-    protected int mTextureLoc;
+    protected int aPositionLoc = INVALID_HANDLE;
+    protected int aTextureCoordLoc = INVALID_HANDLE;
+    protected int uMVPMatrixLoc = INVALID_HANDLE;
+    protected int uTexMatrixLoc = INVALID_HANDLE;
+    protected int mTextureLoc = INVALID_HANDLE;
 
     // 顶点坐标和纹理坐标
     protected GLCoordBuffer mGLCoordBuffer;
     // 矩阵控制
     protected MatrixState mMatrixState;
+
+    protected int mDrawMode = GLES20.GL_TRIANGLE_STRIP; // 绘制的模式
 
     private GLBaseLayer() {
         // no - op by default
@@ -47,9 +50,9 @@ public class GLBaseLayer implements GLLayer {
     }
 
     @Override
-    public void setProjectOrtho(GL10 gl, int width, int height) {
+    public void setProjectOrtho(int width, int height) {
         float ratio = 1.0f * height / width;
-        mMatrixState.setProjectOrtho(-1.0f, 1.0f, -ratio, ratio, 1.0f, -1.0f);
+        mMatrixState.setProjectOrtho(-1.0f, 1.0f, -ratio, ratio, -1.0f, 1.0f);
     }
 
     @Override
@@ -68,6 +71,11 @@ public class GLBaseLayer implements GLLayer {
     }
 
     @Override
+    public void preDraw() {
+        // no - op by default
+    }
+
+    @Override
     public void getHandle() {
         aPositionLoc = GLES20.glGetAttribLocation(mProgramHandle, "aPosition");
         aTextureCoordLoc = GLES20.glGetAttribLocation(mProgramHandle, "aTextureCoord");
@@ -81,7 +89,7 @@ public class GLBaseLayer implements GLLayer {
         onUseProgram();
         onEnableTexture(GLES20.GL_TEXTURE_2D, textureId);
         enableHandle(mvpMatrix, texMatrix);
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, mGLCoordBuffer.getVertexCount());
+        GLES20.glDrawArrays(mDrawMode, 0, mGLCoordBuffer.getVertexCount());
         disableHandle();
         onUnbindTexture(GLES20.GL_TEXTURE_2D);
         onUnUseProgram();
@@ -95,43 +103,81 @@ public class GLBaseLayer implements GLLayer {
     }
 
     @Override
+    public void onDraw(int textureId, float[] mvpMatrix,
+                       float[] texMatrix, GLCoordBuffer glCoordBuffer) {
+        if (glCoordBuffer != null) {
+            mGLCoordBuffer = glCoordBuffer;
+        }
+
+        onDraw(textureId, mvpMatrix, texMatrix);
+    }
+
+    @Override
+    public void onDraw(int textureId, float[] mvpMatrix,
+                       float[] texMatrix, GLCoordBuffer glCoordBuffer, int drawMode) {
+        mDrawMode = drawMode;
+
+        onDraw(textureId, mvpMatrix, texMatrix, glCoordBuffer);
+    }
+
+    @Override
     public void enableHandle(float[] mvpMatrix, float[] texMatrix) {
         // 矩阵传入shader程序
-        GLES20.glUniformMatrix4fv(uMVPMatrixLoc, 1, false, mvpMatrix, 0);
-        GLES20.glUniformMatrix4fv(uTexMatrixLoc, 1, false, texMatrix, 0);
+        if (GLUtilsEx.INVALID_HANDLE != uMVPMatrixLoc) {
+            GLES20.glUniformMatrix4fv(uMVPMatrixLoc, 1, false, mvpMatrix, 0);
+        }
+        if (GLUtilsEx.INVALID_HANDLE != uTexMatrixLoc) {
+            GLES20.glUniformMatrix4fv(uTexMatrixLoc, 1, false, texMatrix, 0);
+        }
 
         // 为画笔指定顶点位置数据
-        GLES20.glVertexAttribPointer(aPositionLoc, mGLCoordBuffer.getCoordsPerVertex(),
-                GLES20.GL_FLOAT, false, mGLCoordBuffer.getVertexStride(),
-                mGLCoordBuffer.getVertexBuffer());
+        if (GLUtilsEx.INVALID_HANDLE != aPositionLoc) {
+            GLES20.glVertexAttribPointer(aPositionLoc, mGLCoordBuffer.getCoordsPerVertex(),
+                    GLES20.GL_FLOAT, false, mGLCoordBuffer.getVertexStride(),
+                    mGLCoordBuffer.getVertexBuffer());
+        }
 
         // 为画笔指定纹理位置数据
-        GLES20.glVertexAttribPointer(aTextureCoordLoc, mGLCoordBuffer.getCoordsPerVertex(),
-                GLES20.GL_FLOAT, false, mGLCoordBuffer.getTexCoordStride(),
-                mGLCoordBuffer.getTexCoordBuffer());
+        if (GLUtilsEx.INVALID_HANDLE != aTextureCoordLoc) {
+            GLES20.glVertexAttribPointer(aTextureCoordLoc, mGLCoordBuffer.getCoordsPerVertex(),
+                    GLES20.GL_FLOAT, false, mGLCoordBuffer.getTexCoordStride(),
+                    mGLCoordBuffer.getTexCoordBuffer());
+        }
 
         // 允许位置数据数组
-        GLES20.glEnableVertexAttribArray(aPositionLoc);
-        GLES20.glEnableVertexAttribArray(aTextureCoordLoc);
+        if (GLUtilsEx.INVALID_HANDLE != aPositionLoc) {
+            GLES20.glEnableVertexAttribArray(aPositionLoc);
+        }
+        if (GLUtilsEx.INVALID_HANDLE != aTextureCoordLoc) {
+            GLES20.glEnableVertexAttribArray(aTextureCoordLoc);
+        }
     }
 
     @Override
     public void disableHandle() {
-        GLES20.glDisableVertexAttribArray(aPositionLoc);
-        GLES20.glDisableVertexAttribArray(aTextureCoordLoc);
+        if (GLUtilsEx.INVALID_HANDLE != aPositionLoc) {
+            GLES20.glDisableVertexAttribArray(aPositionLoc);
+        }
+        if (GLUtilsEx.INVALID_HANDLE != aTextureCoordLoc) {
+            GLES20.glDisableVertexAttribArray(aTextureCoordLoc);
+        }
     }
 
-    private void onEnableTexture(int target,
-                                 int textureId) {
-        // 激活纹理单元0
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
-        // 绑定2D纹理
-        GLES20.glBindTexture(target, textureId);
-        // 将纹理设置给Shader
-        GLES20.glUniform1i(mTextureLoc, 1);
+    @Override
+    public void onEnableTexture(int target,
+                                int textureId) {
+        if (textureId != GLUtilsEx.NO_TEXTURE) {
+            // 激活纹理单元0
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+            // 绑定2D纹理
+            GLES20.glBindTexture(target, textureId);
+            // 将纹理设置给Shader
+            GLES20.glUniform1i(mTextureLoc, 0);
+        }
     }
 
-    private void onUnbindTexture(int target) {
+    @Override
+    public void onUnbindTexture(int target) {
         GLES20.glBindTexture(target, 0);
     }
 
@@ -151,6 +197,10 @@ public class GLBaseLayer implements GLLayer {
         return mMatrixState.getMVPMatrix();
     }
 
+    public float[] getFullMVPMatrix(float w, float h) {
+        return mMatrixState.getFullMVPMatrix(w, h);
+    }
+
     @Override
     public void destroy() {
         if (mProgramHandle != 0) {
@@ -160,10 +210,12 @@ public class GLBaseLayer implements GLLayer {
     }
 
     private void checkProgram(int programHandle) {
-        if (BuildConfig.DEBUG && programHandle == 0) {
-            throw new IllegalStateException("着色器程序创建失败！！！！");
-        } else {
-            Log.e(TAG, "着色器程序创建失败！！！！");
+        if (programHandle == 0) {
+            if (BuildConfig.DEBUG) {
+                throw new IllegalStateException("着色器程序创建失败！！！！");
+            } else {
+                Log.e(TAG, "着色器程序创建失败！！！！");
+            }
         }
     }
 }

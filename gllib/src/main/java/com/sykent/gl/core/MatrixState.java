@@ -2,6 +2,8 @@ package com.sykent.gl.core;
 
 import android.opengl.Matrix;
 
+import com.sykent.gl.data.GLConversion;
+
 /**
  * @author Sykent.Lao e-mail:sykent.lao@gmail.com blog:https://sykent.github.io/
  * @version 1.0
@@ -68,6 +70,18 @@ public class MatrixState {
         Matrix.orthoM(mProjectMatrix, 0, left, right, bottom, top, near, far);
     }
 
+    /**
+     * 默认的gl变换是 rotate -> scale -> translate
+     *
+     * @param glConversion
+     */
+    public void executeDefaultGLConversion(GLConversion glConversion) {
+        // 是前乘，执行的顺序是rotate -> scale -> translate ，先缩放到和最终一样大小，再平移
+        translate(glConversion.getTranslateX(), glConversion.getTranslateY(), 0);
+        scale(glConversion.getScaleX(), glConversion.getScaleY(), 0);
+        rotate(glConversion.getRotateAngle(), 0, 0, 1);
+    }
+
 
     public void translate(float x, float y, float z) {
         Matrix.translateM(mMMatrix, 0, x, y, z);
@@ -85,6 +99,14 @@ public class MatrixState {
         Matrix.multiplyMM(mMVPMatrix, 0, mVMatrix, 0, mMMatrix, 0);
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectMatrix, 0, mMVPMatrix, 0);
         return mMVPMatrix;
+    }
+
+    public float[] getFullMVPMatrix(float w, float h) {
+        pushMatrix();
+        scale(1.0f, (1.0f * h) / w, 1.0f);
+        float[] mvpMatrix = getMVPMatrix();
+        popMatrix();
+        return mvpMatrix;
     }
 
     public void pushMatrix() {

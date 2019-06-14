@@ -4,13 +4,13 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.opengl.GLES20;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.view.View;
 import android.widget.TextView;
 
 import com.sykent.gl.GLSimpleLayer;
+import com.sykent.gl.utils.GLMatrixUtils;
 import com.sykent.gl.utils.GLUtilsEx;
-import com.sykent.gl.utils.MatrixUtils;
 import com.sykent.imagedecode.EBitmapFactory;
 import com.sykent.widget.GLTextureView;
 
@@ -146,8 +146,8 @@ public class BlendActivity extends Activity implements GLTextureView.Renderer {
         this.width = width;
         this.height = height;
 
-        mDstFilter.setProjectOrtho(gl, width, height);
-        mSrcFilter.setProjectOrtho(gl, width, height);
+        mDstFilter.setProjectOrtho(width, height);
+        mSrcFilter.setProjectOrtho(width, height);
     }
 
     @Override
@@ -159,7 +159,7 @@ public class BlendActivity extends Activity implements GLTextureView.Renderer {
         GLES20.glBlendEquation(equaInt[nEquaIndex]);
         GLES20.glViewport(0, 0, width, height);
 
-        mSrcFilter.onDraw(mSrcTextureId, mSrcFilter.getMVPMatrix(), MatrixUtils.getIdentityMatrix());
-        mDstFilter.onDraw(mDstTextureId, mDstFilter.getMVPMatrix(), MatrixUtils.getIdentityMatrix());
+        mSrcFilter.onDraw(mSrcTextureId, mSrcFilter.getMVPMatrix(), GLMatrixUtils.getIdentityMatrix());
+        mDstFilter.onDraw(mDstTextureId, mDstFilter.getMVPMatrix(), GLMatrixUtils.getIdentityMatrix());
     }
 }

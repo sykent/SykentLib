@@ -2,7 +2,7 @@ package com.sykent.utils;
 
 import android.content.Context;
 import android.content.res.AssetManager;
-import android.support.annotation.RawRes;
+import androidx.annotation.RawRes;
 import android.text.TextUtils;
 
 import java.io.ByteArrayOutputStream;

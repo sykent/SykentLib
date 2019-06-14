@@ -17,15 +17,23 @@ public class GLOffscreenBuffer {
     private int mFrameBufferId;
 
     public GLOffscreenBuffer(int width, int height) {
+        this(GLES20.GL_TEXTURE_2D, GLES20.GL_RGBA, width, height);
+    }
+
+    public GLOffscreenBuffer(
+            int target, int internalFormat,
+            int width, int height) {
+        checkArgument(width, height);
+
         mWidth = width;
         mHeight = height;
 
         // 创建buffer 所需的纹理
-        mTextureId = GLUtilsEx.createTexture(GLES20.GL_TEXTURE_2D);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId);
-        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA,
-                width, height, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+        mTextureId = GLUtilsEx.createTexture(target);
+        GLES20.glBindTexture(target, mTextureId);
+        GLES20.glTexImage2D(target, 0, internalFormat,
+                width, height, 0, internalFormat, GLES20.GL_UNSIGNED_BYTE, null);
+        GLES20.glBindTexture(target, 0);
 
         // 创建fbo
         int[] frameBufferHandle = new int[1];
@@ -35,7 +43,7 @@ public class GLOffscreenBuffer {
         onBind(false);
         // 为FrameBuffer 挂载texture 来存储颜色
         GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER,
-                GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, mTextureId, 0);
+                GLES20.GL_COLOR_ATTACHMENT0, target, mTextureId, 0);
         onUnBind();
     }
 
@@ -77,5 +85,11 @@ public class GLOffscreenBuffer {
 
     public int getFrameBufferId() {
         return mFrameBufferId;
+    }
+
+    private void checkArgument(int width, int height) {
+        if (width <= 0 || height <= 0) {
+            throw new IllegalArgumentException("width or height must > 0");
+        }
     }
 }

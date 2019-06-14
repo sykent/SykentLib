@@ -8,7 +8,7 @@ import android.opengl.Matrix;
  * @version 1.0
  * @since 2019/04/22
  */
-public class MatrixUtils {
+public class GLMatrixUtils {
 
     public static RectF getObjectInCenterRect(RectF objectRect, RectF viewportRect) {
         RectF result = null;
