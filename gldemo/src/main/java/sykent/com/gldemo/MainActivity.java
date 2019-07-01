@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void findView() {
-        mButton = findViewById(R.id.bt_scroll);
         mRoot = findViewById(R.id.ll_root);
     }
 }
