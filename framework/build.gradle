@@ -1,4 +1,4 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 apply plugin: 'com.jakewharton.butterknife'
 
 android {
@@ -6,7 +6,6 @@ android {
 
 
     defaultConfig {
-        applicationId "sykent.com.gldemo"
         minSdkVersion 26
         targetSdkVersion 28
         versionCode 1
@@ -16,11 +15,6 @@ android {
 
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
     buildTypes {
         release {
             minifyEnabled false
@@ -28,27 +22,19 @@ android {
         }
     }
 
-    sourceSets { main { assets.srcDirs = ['src/main/assets', 'src/main/assets/'] } }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation project(":common")
-    implementation project(":gllib")
-    implementation project(":medialib")
-    implementation project(":framework")
-
     // butterknife
     implementation 'com.jakewharton:butterknife:10.1.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.1.0'
 
-    // android x
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation project(":common")
+
     implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     testImplementation 'junit:junit:4.12'
-    // android test
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }

@@ -1,13 +1,15 @@
-package sykent.com.gldemo;
+package sykent.com.gldemo.activity;
 
-import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.opengl.GLES20;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+
+import com.sykent.framework.activity.BaseActivity;
 import com.sykent.gl.GLSimpleLayer;
 import com.sykent.gl.utils.GLMatrixUtils;
 import com.sykent.gl.utils.GLUtilsEx;
@@ -17,6 +19,9 @@ import com.sykent.widget.GLTextureView;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import butterknife.BindView;
+import butterknife.OnClick;
+import sykent.com.gldemo.R;
 import sykent.com.gldemo.widget.WheelView;
 
 /**
@@ -24,9 +29,13 @@ import sykent.com.gldemo.widget.WheelView;
  * @version 1.0
  * @since 2019/04/23
  */
-public class BlendActivity extends Activity implements GLTextureView.Renderer {
+public class BlendActivity extends BaseActivity implements GLTextureView.Renderer {
 
-    private GLTextureView mGLView;
+    @BindView(R.id.blend_gl_view)
+    GLTextureView mGLView;
+    @BindView(R.id.blend_equa_textview)
+    TextView mEqua;
+
     private Bitmap srcBitmap;
     private Bitmap dstBitmap;
     private int mDstTextureId;
@@ -35,7 +44,6 @@ public class BlendActivity extends Activity implements GLTextureView.Renderer {
     private GLSimpleLayer mSrcFilter;
     private WheelView mSrcParamView;
     private WheelView mDstParamsView;
-    private TextView mEqua;
 
     private int width, height;
 
@@ -69,14 +77,26 @@ public class BlendActivity extends Activity implements GLTextureView.Renderer {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_blend);
-        mEqua = (TextView) findViewById(R.id.mEqua);
-        mGLView = (GLTextureView) findViewById(R.id.mGLView);
+    }
+
+    @OnClick({R.id.normal_back_icon})
+    public void onClick(View view) {
+        finish();
+    }
+
+    @Override
+    public void initView() {
+        super.initView();
         mGLView.setEGLContextClientVersion(2);
-        mGLView.setEGLConfigChooser(8, 8, 8, 8, 16, 8);
+        mGLView.setEGLConfigChooser(8, 8,
+                8, 8, 16, 8);
         mGLView.setRenderer(this);
         mGLView.setRenderMode(GLTextureView.RENDERMODE_CONTINUOUSLY);
+    }
 
+    @Override
+    public void initData(@Nullable Bundle savedInstanceState, Intent intent) {
+        super.initData(savedInstanceState, intent);
         mEqua.setText(equaStr[nEquaIndex]);
         mEqua.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,7 +113,6 @@ public class BlendActivity extends Activity implements GLTextureView.Renderer {
         mDstParamsView = (WheelView) findViewById(R.id.mDstParam);
 
         initParamData();
-
     }
 
     private void initParamData() {
@@ -161,5 +180,16 @@ public class BlendActivity extends Activity implements GLTextureView.Renderer {
 
         mSrcFilter.onDraw(mSrcTextureId, mSrcFilter.getMVPMatrix(), GLMatrixUtils.getIdentityMatrix());
         mDstFilter.onDraw(mDstTextureId, mDstFilter.getMVPMatrix(), GLMatrixUtils.getIdentityMatrix());
+    }
+
+
+    @Override
+    public int provideContentViewLayoutResID() {
+        return R.layout.activity_blend;
+    }
+
+    @Override
+    public int provideTitleViewLayoutResID() {
+        return R.layout.normal_title;
     }
 }
