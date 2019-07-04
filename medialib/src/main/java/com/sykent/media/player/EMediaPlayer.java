@@ -129,4 +129,8 @@ public class EMediaPlayer implements IPlayer {
             mPlayer.setOnPreparedListener(null);
         }
     }
+
+    public MediaPlayer getPlayer() {
+        return mPlayer;
+    }
 }

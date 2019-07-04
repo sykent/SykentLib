@@ -1,15 +1,17 @@
 package sykent.com.gldemo.activity;
 
-import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-import android.widget.LinearLayout;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.sykent.framework.activity.BaseActivity;
+import com.sykent.utils.Utils;
 
-import sykent.com.gldemo.LayoutRenderer;
+import butterknife.BindView;
+import butterknife.OnClick;
 import sykent.com.gldemo.R;
-
-import static com.sykent.widget.GLTextureView.RENDERMODE_CONTINUOUSLY;
+import sykent.com.gldemo.layout.LayoutGLSurfaceView;
 
 /**
  * @author Sykent.Lao e-mail:sykent.lao@gmail.com blog:https://sykent.github.io/
@@ -17,39 +19,55 @@ import static com.sykent.widget.GLTextureView.RENDERMODE_CONTINUOUSLY;
  * @since 2019/07/01
  */
 public class GLLayoutActivity extends BaseActivity {
-    private LinearLayout mRoot;
 
-    private GLSurfaceView.Renderer mRenderer;
-    private GLSurfaceView mGLTextureView;
-
+    @BindView(R.id.layout_gl_surface_view)
+    LayoutGLSurfaceView mGLTextureView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        findView();
-        init();
         initListener();
     }
 
-    private void init() {
-        mRenderer = new LayoutRenderer(this);
+    @Override
+    public void initView() {
+        super.initView();
 
-        mGLTextureView = new GLSurfaceView(this);
-        mGLTextureView.setEGLContextClientVersion(2);
-        mGLTextureView.setRenderer(mRenderer);
-        mGLTextureView.setRenderMode(RENDERMODE_CONTINUOUSLY);
+        // 设置标题
+        ((TextView) findViewById(R.id.normal_title_caption)).setText("GL 布局");
 
-        LinearLayout.LayoutParams lParams = new LinearLayout.LayoutParams(1080, 1080);
-        mRoot.addView(mGLTextureView, lParams);
+        ViewGroup.LayoutParams layoutParams = mGLTextureView.getLayoutParams();
+        layoutParams.height = Utils.getScreenWidth();
+        mGLTextureView.setLayoutParams(layoutParams);
+        mGLTextureView.init();
+    }
+
+    @OnClick({R.id.normal_back_icon})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.normal_back_icon:
+                finish();
+                break;
+        }
     }
 
     private void initListener() {
 
     }
 
-    private void findView() {
-        mRoot = findViewById(R.id.ll_root);
+    @Override
+    public int provideTitleViewLayoutResID() {
+        return R.layout.normal_title;
+    }
+
+    @Override
+    public int provideContentViewLayoutResID() {
+        return R.layout.activity_layout;
+    }
+
+    @Override
+    protected void onDestroy() {
+        mGLTextureView.destroy();
+        super.onDestroy();
     }
 }

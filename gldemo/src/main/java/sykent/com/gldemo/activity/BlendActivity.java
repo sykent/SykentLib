@@ -36,6 +36,7 @@ public class BlendActivity extends BaseActivity implements GLTextureView.Rendere
     @BindView(R.id.blend_equa_textview)
     TextView mEqua;
 
+
     private Bitmap srcBitmap;
     private Bitmap dstBitmap;
     private int mDstTextureId;
@@ -87,6 +88,11 @@ public class BlendActivity extends BaseActivity implements GLTextureView.Rendere
     @Override
     public void initView() {
         super.initView();
+
+        // 设置标题
+        ((TextView) findViewById(R.id.normal_title_caption)).setText("GL 混合");
+
+
         mGLView.setEGLContextClientVersion(2);
         mGLView.setEGLConfigChooser(8, 8,
                 8, 8, 16, 8);
@@ -155,8 +161,8 @@ public class BlendActivity extends BaseActivity implements GLTextureView.Rendere
         GLES20.glClearColor(0, 0, 0, 0);
         mDstFilter = new GLSimpleLayer(this);
         mSrcFilter = new GLSimpleLayer(this);
-        mSrcTextureId = GLUtilsEx.createTexture(srcBitmap);
-        mDstTextureId = GLUtilsEx.createTexture(dstBitmap);
+        mSrcTextureId = GLUtilsEx.createTexture(srcBitmap, false, true);
+        mDstTextureId = GLUtilsEx.createTexture(dstBitmap, false, true);
 
     }
 

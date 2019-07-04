@@ -1,4 +1,4 @@
-package sykent.com.gldemo;
+package sykent.com.gldemo.layout;
 
 import android.content.Context;
 import android.graphics.Bitmap;

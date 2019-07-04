@@ -30,6 +30,7 @@ dependencies {
     // tp
     api 'com.blankj:utilcode:1.19.0'
     api 'com.commit451:NativeStackBlur:1.0.2'
+    implementation 'me.drakeet.support:toastcompat:1.1.0'
 
     implementation 'androidx.appcompat:appcompat:1.0.0'
     testImplementation 'junit:junit:4.12'
