@@ -83,6 +83,11 @@ public class EMediaPlayer implements IPlayer {
     }
 
     @Override
+    public int getDuration() {
+        return mPlayer.getDuration();
+    }
+
+    @Override
     public void setLooping(boolean looping) {
         mPlayer.setLooping(looping);
     }

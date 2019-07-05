@@ -23,6 +23,8 @@ public interface GLLayer {
 
     void onDraw(final int textureId, float[] mvpMatrix, float[] texMatrix);
 
+    void onDraw(int target, final int textureId, float[] mvpMatrix, float[] texMatrix);
+
     void onDraw(final int textureId, float[] mvpMatrix, float[] texMatrix, GLCoordBuffer glCoordBuffer);
 
     void onDraw(final int textureId, float[] mvpMatrix, float[] texMatrix, GLCoordBuffer glCoordBuffer, int drawMode);

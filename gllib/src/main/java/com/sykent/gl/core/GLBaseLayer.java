@@ -85,42 +85,6 @@ public class GLBaseLayer implements GLLayer {
     }
 
     @Override
-    public void onDraw(int textureId, float[] mvpMatrix, float[] texMatrix) {
-        onUseProgram();
-        onEnableTexture(GLES20.GL_TEXTURE_2D, textureId);
-        enableHandle(mvpMatrix, texMatrix);
-        GLES20.glDrawArrays(mDrawMode, 0, mGLCoordBuffer.getVertexCount());
-        disableHandle();
-        onUnbindTexture(GLES20.GL_TEXTURE_2D);
-        onUnUseProgram();
-    }
-
-    public void onDraw(int textureId, float[] texMatrix, float rotateAngle) {
-        mMatrixState.pushMatrix();
-        mMatrixState.rotate(rotateAngle, 0, 0, 1);
-        onDraw(textureId, getMVPMatrix(), texMatrix);
-        mMatrixState.popMatrix();
-    }
-
-    @Override
-    public void onDraw(int textureId, float[] mvpMatrix,
-                       float[] texMatrix, GLCoordBuffer glCoordBuffer) {
-        if (glCoordBuffer != null) {
-            mGLCoordBuffer = glCoordBuffer;
-        }
-
-        onDraw(textureId, mvpMatrix, texMatrix);
-    }
-
-    @Override
-    public void onDraw(int textureId, float[] mvpMatrix,
-                       float[] texMatrix, GLCoordBuffer glCoordBuffer, int drawMode) {
-        mDrawMode = drawMode;
-
-        onDraw(textureId, mvpMatrix, texMatrix, glCoordBuffer);
-    }
-
-    @Override
     public void enableHandle(float[] mvpMatrix, float[] texMatrix) {
         // 矩阵传入shader程序
         if (GLUtilsEx.INVALID_HANDLE != uMVPMatrixLoc) {
@@ -151,6 +115,47 @@ public class GLBaseLayer implements GLLayer {
         if (GLUtilsEx.INVALID_HANDLE != aTextureCoordLoc) {
             GLES20.glEnableVertexAttribArray(aTextureCoordLoc);
         }
+    }
+
+    @Override
+    public void onDraw(int textureId, float[] mvpMatrix, float[] texMatrix) {
+        onDraw(GLES20.GL_TEXTURE_2D, textureId, mvpMatrix, texMatrix);
+    }
+
+    public void onDraw(int textureId, float[] texMatrix, float rotateAngle) {
+        mMatrixState.pushMatrix();
+        mMatrixState.rotate(rotateAngle, 0, 0, 1);
+        onDraw(textureId, getMVPMatrix(), texMatrix);
+        mMatrixState.popMatrix();
+    }
+
+    @Override
+    public void onDraw(int textureId, float[] mvpMatrix,
+                       float[] texMatrix, GLCoordBuffer glCoordBuffer) {
+        if (glCoordBuffer != null) {
+            mGLCoordBuffer = glCoordBuffer;
+        }
+
+        onDraw(textureId, mvpMatrix, texMatrix);
+    }
+
+    @Override
+    public void onDraw(int textureId, float[] mvpMatrix,
+                       float[] texMatrix, GLCoordBuffer glCoordBuffer, int drawMode) {
+        mDrawMode = drawMode;
+
+        onDraw(textureId, mvpMatrix, texMatrix, glCoordBuffer);
+    }
+
+    @Override
+    public void onDraw(int target, int textureId, float[] mvpMatrix, float[] texMatrix) {
+        onUseProgram();
+        onEnableTexture(target, textureId);
+        enableHandle(mvpMatrix, texMatrix);
+        GLES20.glDrawArrays(mDrawMode, 0, mGLCoordBuffer.getVertexCount());
+        disableHandle();
+        onUnbindTexture(target);
+        onUnUseProgram();
     }
 
     @Override

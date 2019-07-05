@@ -39,6 +39,8 @@ public interface IPlayer {
 
     void reset();
 
+    int getDuration();
+
     /**
      * Register a callback to be invoked when a seek operation has been
      * completed.
@@ -102,6 +104,13 @@ public interface IPlayer {
          * @param mp the MediaPlayer that issued the seek operation
          */
         void onSeekComplete(IPlayer mp);
+    }
+
+    /**
+     * play progress callback
+     */
+    interface OnPlayProgressListener {
+        void onProgress(float progress);
     }
 
 }

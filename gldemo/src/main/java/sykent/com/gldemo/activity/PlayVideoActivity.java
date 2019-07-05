@@ -1,6 +1,10 @@
 package sykent.com.gldemo.activity;
 
+import android.graphics.Bitmap;
+import android.media.ThumbnailUtils;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -8,9 +12,11 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 
 import com.blankj.utilcode.util.FileUtils;
+import com.blankj.utilcode.util.ImageUtils;
 import com.sykent.UIRun;
 import com.sykent.framework.activity.BaseActivity;
 import com.sykent.media.info.VideoInfo;
+import com.sykent.media.player.IPlayer;
 import com.sykent.utils.MediaUtils;
 import com.sykent.utils.ToastUtils;
 import com.sykent.utils.Utils;
@@ -53,19 +59,31 @@ public class PlayVideoActivity extends BaseActivity {
 
 
         ViewGroup.LayoutParams layoutParams = mPlayVideo.getLayoutParams();
-        String path = "/storage/emulated/0/DCIM/Camera/8.mp4";
+        String videoPath = "/storage/emulated/0/DCIM/Camera/8.mp4";
+        Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(videoPath,
+                MediaStore.Images.Thumbnails.MICRO_KIND);
+        String coverPath = "/storage/emulated/0/DCIM/Camera/8.png";
+        com.sykent.utils.FileUtils.write2SD(bitmap, coverPath, true);
 
         float aspectRatio = 1.0f;
-        VideoInfo videoInfo = MediaUtils.getVideoInfo(path);
+        VideoInfo videoInfo = MediaUtils.getVideoInfo(videoPath);
         if (videoInfo != null) {
             aspectRatio = 1.0f * videoInfo.getHeight() / videoInfo.getWidth();
         }
 
         layoutParams.height = (int) (Utils.getScreenWidth() * aspectRatio);
         mPlayVideo.setLayoutParams(layoutParams);
-        mPlayVideo.init(path);
+        mPlayVideo.init(videoPath, coverPath);
+        mPlayVideo.setLoopRange(0, 10 * 1000);
 
-        if (!FileUtils.isFileExists(path)) {
+        mPlayVideo.setProgressListener(new IPlayer.OnPlayProgressListener() {
+            @Override
+            public void onProgress(float progress) {
+//                Log.d("TTTTTTTTT", "progress:  " + progress);
+            }
+        });
+
+        if (!FileUtils.isFileExists(videoPath)) {
             UIRun.postDelayed(new Runnable() {
                 @Override
                 public void run() {
