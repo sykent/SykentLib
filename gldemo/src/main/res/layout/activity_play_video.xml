@@ -3,11 +3,41 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <sykent.com.gldemo.player.GLPlayView
-        android:id="@+id/play_video_sv"
+    <RelativeLayout
+        android:id="@+id/play_video_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true" />
+        android:layout_marginTop="100dp">
+
+        <sykent.com.gldemo.player.GLPlayView
+            android:id="@+id/play_video_sv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:id="@+id/play_video_pause"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/play_video_pause_selector"
+            android:visibility="invisible" />
+    </RelativeLayout>
+
+    <SeekBar
+        android:id="@+id/play_video_seek_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="100dp"
+        android:background="#80808080"
+        android:max="100"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:progressDrawable="@drawable/style_video_seek_bar"
+        android:thumb="@drawable/thumb_seek_bar_selector" />
 
 
 </RelativeLayout>

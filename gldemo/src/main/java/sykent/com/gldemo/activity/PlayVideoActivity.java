@@ -4,19 +4,21 @@ import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
 import com.blankj.utilcode.util.FileUtils;
-import com.blankj.utilcode.util.ImageUtils;
 import com.sykent.UIRun;
 import com.sykent.framework.activity.BaseActivity;
 import com.sykent.media.info.VideoInfo;
 import com.sykent.media.player.IPlayer;
+import com.sykent.simplelistener.SimpleOnSeekBarChangeListener;
 import com.sykent.utils.MediaUtils;
 import com.sykent.utils.ToastUtils;
 import com.sykent.utils.Utils;
@@ -35,17 +37,33 @@ public class PlayVideoActivity extends BaseActivity {
 
     @BindView(R.id.play_video_sv)
     GLPlayView mPlayVideo;
+    @BindView(R.id.play_video_container)
+    RelativeLayout mPlayVideoContainer;
+    @BindView(R.id.play_video_pause)
+    ImageView mPause;
+    @BindView(R.id.play_video_seek_bar)
+    SeekBar mSeekBar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
-    @OnClick({R.id.normal_back_icon})
+    @OnClick({R.id.normal_back_icon, R.id.play_video_pause, R.id.play_video_sv})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.normal_back_icon:
                 finish();
+                break;
+            case R.id.play_video_pause:
+            case R.id.play_video_sv:
+                if (mPlayVideo.isPlaying()) {
+                    mPlayVideo.pause();
+                    mPause.setVisibility(View.VISIBLE);
+                } else {
+                    mPlayVideo.start();
+                    mPause.setVisibility(View.INVISIBLE);
+                }
                 break;
         }
     }
@@ -58,7 +76,6 @@ public class PlayVideoActivity extends BaseActivity {
         ((TextView) findViewById(R.id.normal_title_caption)).setText("GL 播放器");
 
 
-        ViewGroup.LayoutParams layoutParams = mPlayVideo.getLayoutParams();
         String videoPath = "/storage/emulated/0/DCIM/Camera/8.mp4";
         Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(videoPath,
                 MediaStore.Images.Thumbnails.MICRO_KIND);
@@ -71,26 +88,50 @@ public class PlayVideoActivity extends BaseActivity {
             aspectRatio = 1.0f * videoInfo.getHeight() / videoInfo.getWidth();
         }
 
-        layoutParams.height = (int) (Utils.getScreenWidth() * aspectRatio);
+        ViewGroup.LayoutParams layoutParams = null;
+        int height = (int) (Utils.getScreenWidth() * aspectRatio);
+        layoutParams = mPlayVideoContainer.getLayoutParams();
+        layoutParams.height = height;
+        mPlayVideoContainer.setLayoutParams(layoutParams);
+
+        layoutParams = mPlayVideo.getLayoutParams();
+        layoutParams.height = height;
         mPlayVideo.setLayoutParams(layoutParams);
         mPlayVideo.init(videoPath, coverPath);
-        mPlayVideo.setLoopRange(0, 10 * 1000);
+        // 设置播放范围
+//        mPlayVideo.setLoopRange(0, 10 * 1000);
 
-        mPlayVideo.setProgressListener(new IPlayer.OnPlayProgressListener() {
-            @Override
-            public void onProgress(float progress) {
-//                Log.d("TTTTTTTTT", "progress:  " + progress);
-            }
-        });
+        // 初始化监听器
+        initListener();
 
         if (!FileUtils.isFileExists(videoPath)) {
-            UIRun.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    ToastUtils.showToast(PlayVideoActivity.this, "视频路径不存在，请确认！！！！");
-                }
-            }, 500);
+            UIRun.postDelayed(() -> ToastUtils.showToast(PlayVideoActivity.this, "视频路径不存在，请确认！！！！"), 500);
         }
+    }
+
+    private void initListener() {
+        mPlayVideo.setProgressListener(progress -> mSeekBar.setProgress((int) (progress * mSeekBar.getMax())));
+
+        mSeekBar.setOnSeekBarChangeListener(new SimpleOnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    float seekTimeProgress = 1.0f * progress / seekBar.getMax();
+                    mPlayVideo.seekTo((int) (seekTimeProgress * mPlayVideo.getDuration()));
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                mPlayVideo.pause();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                mPlayVideo.start();
+            }
+
+        });
     }
 
     @Override
@@ -106,12 +147,14 @@ public class PlayVideoActivity extends BaseActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        mPlayVideo.onPause();
         mPlayVideo.pause();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        mPlayVideo.onResume();
         mPlayVideo.start();
     }
 

@@ -1,10 +1,8 @@
 package sykent.com.gldemo.player;
 
 import android.content.Context;
-import android.graphics.SurfaceTexture;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
-import android.util.Log;
 
 import com.sykent.media.player.EMediaPlayer;
 import com.sykent.media.player.IPlayer;
@@ -46,25 +44,22 @@ public class GLPlayView extends GLSurfaceView {
         initMediaPlayer(videoPath);
         mRenderer.setPlayer(mPlayer);
 
-        mRenderer.setFrameAvailableListener(new SurfaceTexture.OnFrameAvailableListener() {
-            @Override
-            public void onFrameAvailable(SurfaceTexture surfaceTexture) {
-                // 进度回调
-                if (mProgressListener != null) {
-                    int duration = mPlayer.getDuration();
-                    if (duration > 0) {
-                        mProgressListener.onProgress(
-                                1.0f * mPlayer.getCurrentPosition() / duration);
-                    }
+        mRenderer.setFrameAvailableListener(surfaceTexture -> {
+            // 进度回调
+            if (mProgressListener != null) {
+                int duration = mPlayer.getDuration();
+                if (duration > 0) {
+                    mProgressListener.onProgress(
+                            1.0f * mPlayer.getCurrentPosition() / duration);
                 }
-
-                // 范围播放循环处理
-                if (isRangeLoop() && isOutLoopRange()) {
-                    seekRangeStart();
-                }
-
-                requestRender();
             }
+
+            // 范围播放循环处理
+            if (isRangeLoop() && isOutLoopRange()) {
+                seekRangeStart();
+            }
+
+            requestRender();
         });
         setRenderer(mRenderer);
         setRenderMode(RENDERMODE_CONTINUOUSLY);
@@ -80,12 +75,7 @@ public class GLPlayView extends GLSurfaceView {
             e.printStackTrace();
         }
 
-        mPlayer.setOnPreparedListener(new IPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(IPlayer mp) {
-                mPlayer.start();
-            }
-        });
+        mPlayer.setOnPreparedListener(mp -> mPlayer.start());
     }
 
     private boolean isOutLoopRange() {
@@ -138,13 +128,23 @@ public class GLPlayView extends GLSurfaceView {
         mProgressListener = progressListener;
     }
 
+    public boolean isPlaying() {
+        return mPlayer.isPlaying();
+    }
+
+    public void seekTo(int msec) {
+        mPlayer.seekTo(msec);
+    }
+
+    public int getDuration() {
+        return mPlayer.getDuration();
+    }
+
     public void pause() {
-        onPause();
         mPlayer.pause();
     }
 
     public void start() {
-        onResume();
         mPlayer.start();
     }
 
