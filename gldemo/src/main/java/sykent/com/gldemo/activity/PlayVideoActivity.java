@@ -147,14 +147,12 @@ public class PlayVideoActivity extends BaseActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        mPlayVideo.onPause();
         mPlayVideo.pause();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mPlayVideo.onResume();
         mPlayVideo.start();
     }
 
