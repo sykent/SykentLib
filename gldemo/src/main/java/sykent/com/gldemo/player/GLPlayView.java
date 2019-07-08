@@ -19,7 +19,7 @@ import java.io.IOException;
 public class GLPlayView extends GLSurfaceView {
     private Context mContext;
     private IPlayer mPlayer;
-    private PlayVideoRenderer mRenderer;
+    private IVideoRenderer mRenderer;
 
     private IPlayer.OnPlayProgressListener mProgressListener;
 
@@ -37,9 +37,9 @@ public class GLPlayView extends GLSurfaceView {
         mContext = context;
     }
 
-    public void init(String videoPath, String coverPath) {
+    public void init(String videoPath, IVideoRenderer rendererImpl) {
         setEGLContextClientVersion(2);
-        mRenderer = new PlayVideoRenderer(mContext, coverPath);
+        mRenderer = rendererImpl;
 
         initMediaPlayer(videoPath);
         mRenderer.setPlayer(mPlayer);
@@ -146,6 +146,14 @@ public class GLPlayView extends GLSurfaceView {
 
     public void start() {
         mPlayer.start();
+    }
+
+    public IVideoRenderer getRenderer() {
+        return mRenderer;
+    }
+
+    public void aa(){
+
     }
 
     public void destroy() {

@@ -27,6 +27,7 @@
         <activity android:name=".activity.PlayVideoActivity" />
         <activity android:name=".activity.BlendActivity" />
         <activity android:name=".activity.GLLayoutActivity" />
+        <activity android:name=".activity.EffectVideoActivity" />
 
     </application>
 

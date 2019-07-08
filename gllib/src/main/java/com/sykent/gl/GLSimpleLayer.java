@@ -20,7 +20,7 @@ public class GLSimpleLayer extends GLBaseLayer {
         super(GLCoordBuffer.DEFAULT_VERTEX_COORDINATE,
                 flipY ? GLCoordBuffer.DEFAULT_FLIP_Y_TEXTURE_COORDINATE
                         : GLCoordBuffer.DEFAULT_TEXTURE_COORDINATE,
-                VERTEX_SHADER, FRAGMENT_SHANDER);
+                VERTEX_SHADER, FRAGMENT_SHADER);
     }
 
     private static final String VERTEX_SHADER = "uniform mat4 uMVPMatrix;\n" +
@@ -33,7 +33,7 @@ public class GLSimpleLayer extends GLBaseLayer {
             "    gl_Position = uMVPMatrix * aPosition;\n" +
             "    vTextureCoord = (uTexMatrix * aTextureCoord).xy;\n" +
             "}";
-    private static final String FRAGMENT_SHANDER = "precision highp float;\n" +
+    private static final String FRAGMENT_SHADER = "precision highp float;\n" +
             "uniform sampler2D sourceImage;\n" +
             "varying vec2 vTextureCoord;\n" +
             "\n" +

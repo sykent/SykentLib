@@ -1,35 +1,40 @@
-package sykent.com.gldemo.player;
+package sykent.com.gldemo.gleffect;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
-import android.graphics.SurfaceTexture.OnFrameAvailableListener;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.util.Log;
 import android.view.Surface;
 
 import com.blankj.utilcode.util.FileUtils;
 import com.sykent.gl.GLSimpleLayer;
 import com.sykent.gl.GLYuvLayer;
 import com.sykent.gl.core.GLOffscreenBuffer;
+import com.sykent.gl.core.GLOffscreenBufferGroup;
+import com.sykent.gl.core.MatrixState;
+import com.sykent.gl.layer.GLBlurFilter;
 import com.sykent.gl.utils.GLMatrixUtils;
 import com.sykent.gl.utils.GLUtilsEx;
 import com.sykent.imagedecode.EBitmapFactory;
 import com.sykent.imagedecode.core.ImageSize;
 import com.sykent.media.player.IPlayer;
 
+import android.graphics.SurfaceTexture.OnFrameAvailableListener;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import sykent.com.gldemo.player.IVideoRenderer;
+
 /**
- * 播放器的GL 渲染
- *
  * @author Sykent.Lao e-mail:sykent.lao@gmail.com blog:https://sykent.github.io/
  * @version 1.0
- * @since 2019/07/03
+ * @since 2019/07/08
  */
-public class PlayVideoRenderer implements OnFrameAvailableListener, IVideoRenderer {
+public class EffectRenderer implements OnFrameAvailableListener, IVideoRenderer {
 
     private Context mContext;
     private int mWidth;
@@ -39,7 +44,7 @@ public class PlayVideoRenderer implements OnFrameAvailableListener, IVideoRender
     private SurfaceTexture mSurfaceTexture;
     private Surface mSurface;
     private boolean isFrameAvailable;
-    private OnFrameAvailableListener mFrameAvailableListener;
+    private SurfaceTexture.OnFrameAvailableListener mFrameAvailableListener;
 
     private boolean isDrawCover = true;
     private String mCoverPath;
@@ -49,10 +54,13 @@ public class PlayVideoRenderer implements OnFrameAvailableListener, IVideoRender
 
     private GLYuvLayer mYuvLayer;
     private GLSimpleLayer mSimpleLayer;
+    private GLBlurFilter mBlurFilter;
     private GLOffscreenBuffer mOffscreenBuffer;
 
+    private GLOffscreenBufferGroup mOffscreenBufferGroup;
+    private int mRadius;
 
-    public PlayVideoRenderer(Context context, String coverPath) {
+    public EffectRenderer(Context context, String coverPath) {
         mContext = context;
         mCoverPath = coverPath;
     }
@@ -77,8 +85,15 @@ public class PlayVideoRenderer implements OnFrameAvailableListener, IVideoRender
         mYuvLayer.onDraw(mYuvTexture, mYuvLayer.getFullMVPMatrix(mWidth, mHeight), mSTMatrix);
         mOffscreenBuffer.onUnBind();
 
-        mSimpleLayer.onDraw(mOffscreenBuffer.getTextureId(),
-                mSimpleLayer.getFullMVPMatrix(mWidth, mHeight), GLMatrixUtils.getIdentityMatrix());
+//        mSimpleLayer.onDraw(mOffscreenBuffer.getTextureId(),
+//                mSimpleLayer.getFullMVPMatrix(mWidth, mHeight), GLMatrixUtils.getIdentityMatrix());
+
+        GLUtilsEx.checkGlError();
+        long lastTime = System.currentTimeMillis();
+        mBlurFilter.onDraw(mOffscreenBuffer.getTextureId(),
+                mBlurFilter.getFullMVPMatrix(mWidth, mHeight),
+                GLMatrixUtils.getIdentityMatrix(), mRadius);
+        Log.d("ttttttttttttttt", "time:" + (System.currentTimeMillis() - lastTime));
     }
 
     private boolean isDrawCover() {
@@ -100,6 +115,7 @@ public class PlayVideoRenderer implements OnFrameAvailableListener, IVideoRender
     private void createFilter() {
         mYuvLayer = new GLYuvLayer(mContext);
         mSimpleLayer = new GLSimpleLayer(mContext);
+        mBlurFilter = new GLBlurFilter(mContext);
     }
 
     @Override
@@ -119,11 +135,17 @@ public class PlayVideoRenderer implements OnFrameAvailableListener, IVideoRender
         mHeight = height;
         mYuvLayer.setProjectOrtho(width, height);
         mSimpleLayer.setProjectOrtho(width, height);
+        mBlurFilter.setProjectOrtho(width, height);
 
         if (mOffscreenBuffer != null) {
             mOffscreenBuffer.destroy();
         }
         mOffscreenBuffer = new GLOffscreenBuffer(width, height);
+
+        if (mOffscreenBufferGroup != null) {
+            mOffscreenBufferGroup.destroy();
+        }
+        mOffscreenBufferGroup = new GLOffscreenBufferGroup(width, height, 2);
     }
 
     @Override
@@ -136,7 +158,7 @@ public class PlayVideoRenderer implements OnFrameAvailableListener, IVideoRender
     }
 
     @Override
-    public void setFrameAvailableListener(OnFrameAvailableListener frameAvailableListener) {
+    public void setFrameAvailableListener(SurfaceTexture.OnFrameAvailableListener frameAvailableListener) {
         mFrameAvailableListener = frameAvailableListener;
     }
 
@@ -150,10 +172,15 @@ public class PlayVideoRenderer implements OnFrameAvailableListener, IVideoRender
         mPlayer = player;
     }
 
+    public void setBlurRadius(int radius) {
+        mRadius = radius;
+    }
+
     @Override
     public void destroy() {
         GLES20.glDeleteTextures(1, new int[]{mYuvTexture}, 0);
         mOffscreenBuffer.destroy();
+        mOffscreenBufferGroup.destroy();
         mYuvLayer.destroy();
         mSimpleLayer.destroy();
 

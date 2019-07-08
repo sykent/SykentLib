@@ -19,6 +19,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import sykent.com.gldemo.activity.BlendActivity;
+import sykent.com.gldemo.activity.EffectVideoActivity;
 import sykent.com.gldemo.activity.GLLayoutActivity;
 import sykent.com.gldemo.activity.PlayVideoActivity;
 import sykent.com.gldemo.main.MainItemData;
@@ -70,7 +71,7 @@ public class MainActivity extends BaseActivity {
         datas.add(new MainItemData("GL 播放器"));
         datas.add(new MainItemData("GL 混合"));
         datas.add(new MainItemData("GL 布局"));
-        datas.add(new MainItemData("探索Demo"));
+        datas.add(new MainItemData("GL \nEffect Demo"));
         datas.add(new MainItemData("探索Demo"));
         datas.add(new MainItemData("探索Demo"));
 
@@ -104,6 +105,10 @@ public class MainActivity extends BaseActivity {
                 break;
             case 2:
                 intent = new Intent(this, GLLayoutActivity.class);
+                startActivity(intent);
+                break;
+            case 3:
+                intent = new Intent(this, EffectVideoActivity.class);
                 startActivity(intent);
                 break;
             default:

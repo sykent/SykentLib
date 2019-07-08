@@ -17,7 +17,6 @@ import com.blankj.utilcode.util.FileUtils;
 import com.sykent.UIRun;
 import com.sykent.framework.activity.BaseActivity;
 import com.sykent.media.info.VideoInfo;
-import com.sykent.media.player.IPlayer;
 import com.sykent.simplelistener.SimpleOnSeekBarChangeListener;
 import com.sykent.utils.MediaUtils;
 import com.sykent.utils.ToastUtils;
@@ -26,24 +25,32 @@ import com.sykent.utils.Utils;
 import butterknife.BindView;
 import butterknife.OnClick;
 import sykent.com.gldemo.R;
+import sykent.com.gldemo.gleffect.EffectRenderer;
 import sykent.com.gldemo.player.GLPlayView;
-import sykent.com.gldemo.player.PlayVideoRenderer;
 
 /**
  * @author Sykent.Lao e-mail:sykent.lao@gmail.com blog:https://sykent.github.io/
  * @version 1.0
- * @since 2019/07/01
+ * @since 2019/07/08
  */
-public class PlayVideoActivity extends BaseActivity {
-
+public class EffectVideoActivity extends BaseActivity {
     @BindView(R.id.play_video_sv)
     GLPlayView mPlayVideo;
     @BindView(R.id.play_video_container)
     RelativeLayout mPlayVideoContainer;
     @BindView(R.id.play_video_pause)
     ImageView mPause;
+
+    @BindView(R.id.tv_play_progress)
+    TextView mTvProgress;
     @BindView(R.id.play_video_seek_bar)
-    SeekBar mSeekBar;
+    SeekBar mProgressSeekBar;
+
+    @BindView(R.id.tv_blur_radius)
+    TextView mTvRadius;
+    @BindView(R.id.sb_blur_radius)
+    SeekBar mRadiusSeekBar;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,7 +81,7 @@ public class PlayVideoActivity extends BaseActivity {
         super.initView();
 
         // 设置标题
-        ((TextView) findViewById(R.id.normal_title_caption)).setText("GL 播放器");
+        ((TextView) findViewById(R.id.normal_title_caption)).setText("GL Effect Demo");
 
 
         String videoPath = "/storage/emulated/0/DCIM/Camera/8.mp4";
@@ -98,7 +105,7 @@ public class PlayVideoActivity extends BaseActivity {
         layoutParams = mPlayVideo.getLayoutParams();
         layoutParams.height = height;
         mPlayVideo.setLayoutParams(layoutParams);
-        mPlayVideo.init(videoPath, new PlayVideoRenderer(this, coverPath));
+        mPlayVideo.init(videoPath, new EffectRenderer(this, coverPath));
         // 设置播放范围
 //        mPlayVideo.setLoopRange(0, 10 * 1000);
 
@@ -106,20 +113,21 @@ public class PlayVideoActivity extends BaseActivity {
         initListener();
 
         if (!FileUtils.isFileExists(videoPath)) {
-            UIRun.postDelayed(() -> ToastUtils.showToast(PlayVideoActivity.this, "视频路径不存在，请确认！！！！"), 500);
+            UIRun.postDelayed(() -> ToastUtils.showToast(EffectVideoActivity.this, "视频路径不存在，请确认！！！！"), 500);
         }
     }
 
     private void initListener() {
-        mPlayVideo.setProgressListener(progress -> mSeekBar.setProgress((int) (progress * mSeekBar.getMax())));
+        mPlayVideo.setProgressListener(progress -> mProgressSeekBar.setProgress((int) (progress * mProgressSeekBar.getMax())));
 
-        mSeekBar.setOnSeekBarChangeListener(new SimpleOnSeekBarChangeListener() {
+        mProgressSeekBar.setOnSeekBarChangeListener(new SimpleOnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
                     float seekTimeProgress = 1.0f * progress / seekBar.getMax();
                     mPlayVideo.seekTo((int) (seekTimeProgress * mPlayVideo.getDuration()));
                 }
+                mTvProgress.setText("播放进度(" + progress + "):");
             }
 
             @Override
@@ -133,6 +141,24 @@ public class PlayVideoActivity extends BaseActivity {
             }
 
         });
+
+        mRadiusSeekBar.setOnSeekBarChangeListener(new SimpleOnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    EffectRenderer effectRenderer = (EffectRenderer) mPlayVideo.getRenderer();
+                    mPlayVideo.queueEvent(new Runnable() {
+                        @Override
+                        public void run() {
+                            effectRenderer.setBlurRadius(progress);
+                        }
+                    });
+                    mTvRadius.setText("模糊半径(" + progress + "):");
+                }
+            }
+        });
+
+
     }
 
     @Override

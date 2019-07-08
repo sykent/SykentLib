@@ -14,7 +14,7 @@ import com.sykent.gl.core.GLCoordBuffer;
 public class GLYuvLayer extends GLBaseLayer {
     public GLYuvLayer(Context context) {
         super(GLCoordBuffer.DEFAULT_VERTEX_COORDINATE,
-                GLCoordBuffer.DEFAULT_TEXTURE_COORDINATE, VERTEX_SHADER, FRAGMENT_SHANDER);
+                GLCoordBuffer.DEFAULT_TEXTURE_COORDINATE, VERTEX_SHADER, FRAGMENT_SHADER);
     }
 
     @Override
@@ -32,7 +32,7 @@ public class GLYuvLayer extends GLBaseLayer {
             "    gl_Position = uMVPMatrix * aPosition;\n" +
             "    vTextureCoord = (uTexMatrix * aTextureCoord).xy;\n" +
             "}";
-    private static final String FRAGMENT_SHANDER =
+    private static final String FRAGMENT_SHADER =
             "#extension GL_OES_EGL_image_external : require\n" +
                     "precision mediump float;\n" +
                     "varying vec2 vTextureCoord;\n" +

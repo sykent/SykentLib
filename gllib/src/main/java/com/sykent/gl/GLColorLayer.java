@@ -22,7 +22,7 @@ public class GLColorLayer extends GLBaseLayer {
     public GLColorLayer(Context context) {
         super(GLCoordBuffer.DEFAULT_VERTEX_COORDINATE,
                 GLCoordBuffer.DEFAULT_TEXTURE_COORDINATE,
-                VERTEX_SHADER, FRAGMENT_SHANDER);
+                VERTEX_SHADER, FRAGMENT_SHADER);
         mColor = new float[4];
     }
 
@@ -61,7 +61,7 @@ public class GLColorLayer extends GLBaseLayer {
             "void main () {\n" +
             "    gl_Position = uMVPMatrix * aPosition;\n" +
             "}";
-    private static final String FRAGMENT_SHANDER = "precision highp float;\n" +
+    private static final String FRAGMENT_SHADER = "precision highp float;\n" +
             "uniform vec4 uColor;\n" +
             "\n" +
             "void main () {\n" +

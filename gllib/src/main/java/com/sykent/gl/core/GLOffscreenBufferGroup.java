@@ -118,4 +118,12 @@ public class GLOffscreenBufferGroup {
             throw new IllegalArgumentException("num must <= 32");
         }
     }
+
+    public int getWidth() {
+        return mWidth;
+    }
+
+    public int getHeight() {
+        return mHeight;
+    }
 }
