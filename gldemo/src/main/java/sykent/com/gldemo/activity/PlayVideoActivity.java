@@ -42,6 +42,8 @@ public class PlayVideoActivity extends BaseActivity {
     RelativeLayout mPlayVideoContainer;
     @BindView(R.id.play_video_pause)
     ImageView mPause;
+    @BindView(R.id.tv_play_progress)
+    TextView mTvProgress;
     @BindView(R.id.play_video_seek_bar)
     SeekBar mSeekBar;
 
@@ -120,6 +122,7 @@ public class PlayVideoActivity extends BaseActivity {
                     float seekTimeProgress = 1.0f * progress / seekBar.getMax();
                     mPlayVideo.seekTo((int) (seekTimeProgress * mPlayVideo.getDuration()));
                 }
+                mTvProgress.setText("播放进度(" + progress + "):");
             }
 
             @Override

@@ -4,8 +4,11 @@ import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -18,6 +21,7 @@ import com.sykent.UIRun;
 import com.sykent.framework.activity.BaseActivity;
 import com.sykent.media.info.VideoInfo;
 import com.sykent.simplelistener.SimpleOnSeekBarChangeListener;
+import com.sykent.utils.ColorUtils;
 import com.sykent.utils.MediaUtils;
 import com.sykent.utils.ToastUtils;
 import com.sykent.utils.Utils;
@@ -41,6 +45,11 @@ public class EffectVideoActivity extends BaseActivity {
     @BindView(R.id.play_video_pause)
     ImageView mPause;
 
+    @BindView(R.id.et_blur_color)
+    EditText mEtColor;
+    @BindView(R.id.bt_sure_blur_color)
+    Button mBtSureColor;
+
     @BindView(R.id.tv_play_progress)
     TextView mTvProgress;
     @BindView(R.id.play_video_seek_bar)
@@ -57,7 +66,7 @@ public class EffectVideoActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
     }
 
-    @OnClick({R.id.normal_back_icon, R.id.play_video_pause, R.id.play_video_sv})
+    @OnClick({R.id.normal_back_icon, R.id.play_video_pause, R.id.play_video_sv, R.id.bt_sure_blur_color})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.normal_back_icon:
@@ -72,6 +81,21 @@ public class EffectVideoActivity extends BaseActivity {
                     mPlayVideo.start();
                     mPause.setVisibility(View.INVISIBLE);
                 }
+                break;
+            case R.id.bt_sure_blur_color:
+                String s1 = mEtColor.getText().toString();
+                if (TextUtils.isEmpty(s1)) {
+                    return;
+                }
+                int color = ColorUtils.string2Int(s1);
+
+                EffectRenderer effectRenderer = (EffectRenderer) mPlayVideo.getRenderer();
+                mPlayVideo.queueEvent(new Runnable() {
+                    @Override
+                    public void run() {
+                        effectRenderer.setOverlayColor(color);
+                    }
+                });
                 break;
         }
     }
@@ -157,8 +181,6 @@ public class EffectVideoActivity extends BaseActivity {
                 }
             }
         });
-
-
     }
 
     @Override
@@ -168,7 +190,7 @@ public class EffectVideoActivity extends BaseActivity {
 
     @Override
     public int provideContentViewLayoutResID() {
-        return R.layout.activity_play_video;
+        return R.layout.activity_video_effect;
     }
 
     @Override

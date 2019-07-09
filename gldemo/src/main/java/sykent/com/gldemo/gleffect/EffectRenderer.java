@@ -3,6 +3,7 @@ package sykent.com.gldemo.gleffect;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
+import android.graphics.SurfaceTexture.OnFrameAvailableListener;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
@@ -14,15 +15,12 @@ import com.sykent.gl.GLSimpleLayer;
 import com.sykent.gl.GLYuvLayer;
 import com.sykent.gl.core.GLOffscreenBuffer;
 import com.sykent.gl.core.GLOffscreenBufferGroup;
-import com.sykent.gl.core.MatrixState;
 import com.sykent.gl.layer.GLBlurFilter;
 import com.sykent.gl.utils.GLMatrixUtils;
 import com.sykent.gl.utils.GLUtilsEx;
 import com.sykent.imagedecode.EBitmapFactory;
 import com.sykent.imagedecode.core.ImageSize;
 import com.sykent.media.player.IPlayer;
-
-import android.graphics.SurfaceTexture.OnFrameAvailableListener;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -59,6 +57,7 @@ public class EffectRenderer implements OnFrameAvailableListener, IVideoRenderer 
 
     private GLOffscreenBufferGroup mOffscreenBufferGroup;
     private int mRadius;
+    private int mOverlayColor = 0x33000000;
 
     public EffectRenderer(Context context, String coverPath) {
         mContext = context;
@@ -92,7 +91,7 @@ public class EffectRenderer implements OnFrameAvailableListener, IVideoRenderer 
         long lastTime = System.currentTimeMillis();
         mBlurFilter.onDraw(mOffscreenBuffer.getTextureId(),
                 mBlurFilter.getFullMVPMatrix(mWidth, mHeight),
-                GLMatrixUtils.getIdentityMatrix(), mRadius);
+                GLMatrixUtils.getIdentityMatrix(), mRadius, mOverlayColor);
         Log.d("ttttttttttttttt", "time:" + (System.currentTimeMillis() - lastTime));
     }
 
@@ -174,6 +173,10 @@ public class EffectRenderer implements OnFrameAvailableListener, IVideoRenderer 
 
     public void setBlurRadius(int radius) {
         mRadius = radius;
+    }
+
+    public void setOverlayColor(int overlayColor) {
+        mOverlayColor = overlayColor;
     }
 
     @Override

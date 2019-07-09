@@ -1,8 +1,11 @@
 package com.sykent.gl.layer;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.opengl.GLES20;
 
+import com.sykent.gl.GLColorLayer;
+import com.sykent.gl.GLSimpleLayer;
 import com.sykent.gl.core.GLBaseLayer;
 import com.sykent.gl.core.GLCoordBuffer;
 import com.sykent.gl.core.GLOffscreenBuffer;
@@ -18,6 +21,7 @@ import com.sykent.gl.utils.GLMatrixUtils;
 public class GLBlurFilter extends GLBaseLayer {
     // 最大的模糊半径
     private static final int MAX_RADIUS = 25;
+    private Context mContext;
 
     private int mRadius;
     private boolean isHorizontal;
@@ -30,11 +34,18 @@ public class GLBlurFilter extends GLBaseLayer {
 
     private GLOffscreenBufferGroup mOffscreenBufferGroup;
 
+    private int mColor = Color.TRANSPARENT;
+    private GLColorLayer mColorLayer;
+    private GLSimpleLayer mSimpleLayer;
+
     public GLBlurFilter(Context context) {
         super(GLCoordBuffer.DEFAULT_VERTEX_COORDINATE,
                 GLCoordBuffer.DEFAULT_TEXTURE_COORDINATE,
-                VERTEX_SHADER,
-                FRAGMENT_SHADER);
+                VERTEX_SHADER, FRAGMENT_SHADER);
+        mContext = context;
+
+        mColorLayer = new GLColorLayer(mContext);
+        mSimpleLayer = new GLSimpleLayer(mContext);
     }
 
     @Override
@@ -49,8 +60,11 @@ public class GLBlurFilter extends GLBaseLayer {
 
         // 缩小的buff
         float scale = getScale(width, height);
-        mOffscreenBufferGroup = new GLOffscreenBufferGroup(
-                (int) (mWidth * scale), (int) (mHeight * scale), 2);
+        int w = (int) (mWidth * scale);
+        int h = (int) (mHeight * scale);
+        mOffscreenBufferGroup = new GLOffscreenBufferGroup(w, h, 3);
+        mColorLayer.setProjectOrtho(w, h);
+        mSimpleLayer.setProjectOrtho(w, h);
     }
 
     @Override
@@ -69,12 +83,15 @@ public class GLBlurFilter extends GLBaseLayer {
         GLES20.glUniform1f(uHeightOffsetLoc, isHorizontal ? 1f / mOffscreenBufferGroup.getHeight() : 0);
     }
 
-    public void onDraw(int textureId, float[] mvpMatrix, float[] texMatrix, int radius) {
+    public void onDraw(int textureId, float[] mvpMatrix,
+                       float[] texMatrix, int radius, int overlayColor) {
         if (radius > MAX_RADIUS) {
             throw new IllegalArgumentException("radius must less than 25");
         }
 
         mRadius = radius;
+        mColor = overlayColor;
+
         // 先模糊行，再模糊列
         GLOffscreenBuffer buffer = mOffscreenBufferGroup.getBuffer(0);
         int width = buffer.getWidth();
@@ -82,6 +99,7 @@ public class GLBlurFilter extends GLBaseLayer {
 
         GLES20.glViewport(0, 0, width, height);
         super.setProjectOrtho(width, height);
+
 
         buffer.onBind();
         isHorizontal = true;
@@ -94,6 +112,24 @@ public class GLBlurFilter extends GLBaseLayer {
         isHorizontal = false;
         onDraw(tmpTexture, getFullMVPMatrix(width, height), GLMatrixUtils.getIdentityMatrix());
         buffer.onUnBind();
+
+        // 画颜色
+        if (mColor != Color.TRANSPARENT) {
+            GLOffscreenBuffer colorBuffer = mOffscreenBufferGroup.getBuffer(0);
+            colorBuffer.onBind();
+            mColorLayer.onDraw(mColor, mColorLayer.getFullMVPMatrix(width, height));
+            colorBuffer.onUnBind();
+
+            GLES20.glEnable(GLES20.GL_BLEND);
+            buffer = mOffscreenBufferGroup.getBuffer(1);
+            buffer.onBind(false);
+            GLES20.glBlendFuncSeparate(GLES20.GL_SRC_ALPHA,
+                    GLES20.GL_ONE_MINUS_SRC_ALPHA, GLES20.GL_ONE, GLES20.GL_ONE);
+            GLES20.glBlendEquation(GLES20.GL_FUNC_ADD);
+            mSimpleLayer.onDraw(colorBuffer.getTextureId(), mSimpleLayer.getFullMVPMatrix(width, height), GLMatrixUtils.getIdentityMatrix());
+            GLES20.glDisable(GLES20.GL_BLEND);
+            buffer.onUnBind();
+        }
 
         GLES20.glViewport(0, 0, mWidth, mHeight);
         super.setProjectOrtho(mWidth, mHeight);
