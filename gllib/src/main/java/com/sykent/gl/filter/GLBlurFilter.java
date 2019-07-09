@@ -1,4 +1,4 @@
-package com.sykent.gl.layer;
+package com.sykent.gl.filter;
 
 import android.content.Context;
 import android.graphics.Color;

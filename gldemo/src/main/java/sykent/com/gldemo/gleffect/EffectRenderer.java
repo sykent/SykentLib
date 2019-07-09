@@ -15,7 +15,7 @@ import com.sykent.gl.GLSimpleLayer;
 import com.sykent.gl.GLYuvLayer;
 import com.sykent.gl.core.GLOffscreenBuffer;
 import com.sykent.gl.core.GLOffscreenBufferGroup;
-import com.sykent.gl.layer.GLBlurFilter;
+import com.sykent.gl.filter.GLBlurFilter;
 import com.sykent.gl.utils.GLMatrixUtils;
 import com.sykent.gl.utils.GLUtilsEx;
 import com.sykent.imagedecode.EBitmapFactory;
