@@ -1,6 +1,9 @@
 package com.sykent.framework.activity;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -32,8 +35,33 @@ public class BaseActivity extends AppCompatActivity implements IBasePage {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Utils.init();
+        preInitView();
         initView();
         initData(savedInstanceState, getIntent());
+    }
+
+    /**
+     * 权限申请
+     *
+     * @param permissions
+     */
+    protected void permissions(String[] permissions) {
+        if (Build.VERSION.SDK_INT >= 23 && permissions != null && permissions.length > 0) {
+            int REQUEST_CODE_CONTACT = 101;
+            // 验证是否许可权限
+            for (String str : permissions) {
+                if (this.checkSelfPermission(str) != PackageManager.PERMISSION_GRANTED) {
+                    //申请权限
+                    this.requestPermissions(permissions, REQUEST_CODE_CONTACT);
+                    return;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void preInitView() {
+        // no - op by default
     }
 
     @Override

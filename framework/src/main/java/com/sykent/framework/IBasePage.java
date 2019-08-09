@@ -12,6 +12,9 @@ import androidx.annotation.Nullable;
  * @since 2019/07/02
  */
 public interface IBasePage {
+
+    void preInitView();
+
     void initView();
 
     void initData(@Nullable Bundle savedInstanceState, Intent intent);
