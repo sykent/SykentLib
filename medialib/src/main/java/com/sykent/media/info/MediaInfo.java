@@ -6,4 +6,13 @@ package com.sykent.media.info;
  * @since 2019/07/03
  */
 public class MediaInfo {
+    protected String mPath;
+
+    public String getPath() {
+        return mPath;
+    }
+
+    public void setPath(String path) {
+        mPath = path;
+    }
 }

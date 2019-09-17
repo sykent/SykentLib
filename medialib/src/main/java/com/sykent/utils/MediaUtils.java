@@ -26,6 +26,8 @@ public class MediaUtils {
         String duration = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
 
         VideoInfo info = new VideoInfo();
+        info.setPath(path);
+        info.setDuration(NumberUtils.string2Int(duration));
         info.setWidth(NumberUtils.string2Int(width));
         info.setHeight(NumberUtils.string2Int(height));
         mmr.release();
