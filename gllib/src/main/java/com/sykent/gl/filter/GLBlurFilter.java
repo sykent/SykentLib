@@ -183,16 +183,16 @@ public class GLBlurFilter extends GLBaseLayer {
 
     static {
         StringBuilder sb = new StringBuilder();
-        sb.append(" \n").append("precision mediump float;   \n")
+        sb.append(" \n").append("precision lowp float;   \n")
                 .append("varying vec2 vTextureCoord;   \n")
                 .append("uniform sampler2D sourceImage;   \n")
                 .append("uniform int uRadius;   \n")
                 .append("uniform float uWidthOffset;  \n")
                 .append("uniform float uHeightOffset;  \n")
-                .append("mediump float getGaussWeight(mediump float currentPos, mediump float sigma) \n")
-                .append("{ \n")
-                .append("   return 1.0 / sigma * exp(-(currentPos * currentPos) / (2.0 * sigma * sigma)); \n")
-                .append("} \n")
+//                .append("mediump float getGaussWeight(mediump float currentPos, mediump float sigma) \n")
+//                .append("{ \n")
+//                .append("   return 1.0 / sigma * exp(-(currentPos * currentPos) / (2.0 * sigma * sigma)); \n")
+//                .append("} \n")
                 .append("void main() {   \n")
                 .append("int diameter = 2 * uRadius + 1;  \n")
                 .append("   vec4 sampleTex;\n")
