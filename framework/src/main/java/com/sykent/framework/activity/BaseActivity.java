@@ -1,6 +1,5 @@
 package com.sykent.framework.activity;
 
-import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -14,11 +13,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.blankj.utilcode.util.BarUtils;
+import com.blankj.utilcode.util.ScreenUtils;
 import com.sykent.framework.IBasePage;
 import com.sykent.utils.Utils;
 
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
+import sykent.com.framework.R;
 
 /**
  * @author Sykent.Lao e-mail:sykent.lao@gmail.com blog:https://sykent.github.io/
@@ -72,7 +74,9 @@ public class BaseActivity extends AppCompatActivity implements IBasePage {
         setContentView(mRoot, fParams);
 
         // 设置状态栏
-        setStatusBar();
+        if (!ScreenUtils.isFullScreen(this)) {
+            setStatusBar();
+        }
 
         // 标题栏
         int titleLayoutResID = provideTitleViewLayoutResID();
@@ -91,14 +95,32 @@ public class BaseActivity extends AppCompatActivity implements IBasePage {
             titleView.setBackgroundColor(0xfff2f2f2);
         }
 
+        // 设置关闭监听
+        if (titleView != null && findViewById(R.id.normal_back_icon) != null) {
+            View back = findViewById(R.id.normal_back_icon);
+            back.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+        }
+
+
         // 内容区
         int contentLayoutResID = provideContentViewLayoutResID();
+        View contentView = null;
         if (contentLayoutResID != INVALID_LAYOUT_ID) {
-            View view = LayoutInflater.from(this)
+            contentView = LayoutInflater.from(this)
                     .inflate(contentLayoutResID, mRoot, false);
+        }
+        if (contentView == null) {
+            contentView = provideContentView();
+        }
+        if (contentView != null) {
             fParams = new FrameLayout.LayoutParams(-1, -1);
             fParams.topMargin = titleHeight;
-            mRoot.addView(view, fParams);
+            mRoot.addView(contentView, fParams);
         }
 
         // try use butter knife
