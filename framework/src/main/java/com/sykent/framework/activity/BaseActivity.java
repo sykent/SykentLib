@@ -11,6 +11,7 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
 
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.ScreenUtils;
@@ -18,7 +19,6 @@ import com.sykent.framework.IBasePage;
 import com.sykent.utils.Utils;
 
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import butterknife.Unbinder;
 import sykent.com.framework.R;
 
@@ -27,7 +27,7 @@ import sykent.com.framework.R;
  * @version 1.0
  * @since 2019/07/01
  */
-public class BaseActivity extends AppCompatActivity implements IBasePage {
+public class BaseActivity extends FragmentActivity implements IBasePage {
     private static final int INVALID_LAYOUT_ID = -1;
 
     private FrameLayout mRoot;
@@ -88,7 +88,7 @@ public class BaseActivity extends AppCompatActivity implements IBasePage {
                     .inflate(titleLayoutResID, mRoot, false);
         }
         if (titleView != null) {
-            titleHeight = Utils.getRealPixel(90);
+            titleHeight = Utils.getRealPixel3(90);
             fParams = new FrameLayout.LayoutParams(-1, titleHeight);
             fParams.gravity = Gravity.TOP;
             mRoot.addView(titleView, fParams);

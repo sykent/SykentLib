@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="Encoding">
-    <file url="file://$PROJECT_DIR$/gllib/src/main/java/com/sykent/gl/demo/bn/st/d2/DBUtil.java" charset="GBK" />
-  </component>
+  <component name="Encoding" addBOMForNewFiles="with NO BOM" />
 </project>
