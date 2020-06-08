@@ -88,7 +88,7 @@ public class BaseActivity extends FragmentActivity implements IBasePage {
                     .inflate(titleLayoutResID, mRoot, false);
         }
         if (titleView != null) {
-            titleHeight = Utils.getRealPixel3(90);
+            titleHeight = Utils.getRealPixel(90);
             fParams = new FrameLayout.LayoutParams(-1, titleHeight);
             fParams.gravity = Gravity.TOP;
             mRoot.addView(titleView, fParams);
